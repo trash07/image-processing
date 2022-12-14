@@ -34,7 +34,6 @@ export async function ls(relativePath: string): Promise<Array<string>> {
  */
 export async function exactFilename(start: string) {
     const files = await ls(`images/full`);
-    console.log(files, `${start}.`);
     const filteredValues = files.filter((element: string) => _.startsWith(element, `${start}.`))
     if (filteredValues.length === 0) throw new Error('Inexistant file');
     return filteredValues.reduce((element: string) => element);
@@ -48,10 +47,27 @@ export async function exactFilename(start: string) {
  * @param height
  */
 export async function resizeImage(filename: string, width: number, height: number) {
-    // Todo: if same transformation exists just return the old one
+    if (await exactResizeExists(filename, width, height)) return;
     const imageName = await exactFilename(filename);
     await sharp(`${appRootPath.path}/images/full/${imageName}`)
-        .resize({width: width, height: height})
+         .resize({width: width, height: height})
         .toFile(`${appRootPath.path}/images/thumb/${imageName}`);
+}
+
+/**
+ * Check whether a resized image with same dimensions exist
+ * @param filename
+ * @param width
+ * @param height
+ */
+export async function exactResizeExists(filename: string, width: number, height: number): Promise<boolean> {
+    const imageName = await exactFilename(filename);
+    try {
+        const metadata = await sharp(`${appRootPath.path}/images/thumb/${imageName}`)
+            .metadata();
+        return metadata.width === width && metadata.height === height;
+    } catch {
+        return false;
+    }
 }
 
