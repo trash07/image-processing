@@ -31,7 +31,7 @@ export async function ls(relativePath: string): Promise<Array<string>> {
  * Get the exact file name
  * @param start
  */
-export async function exactFilename(start: string) {
+export async function exactFilename(start: string): Promise<string> {
     const files = await ls(`images/full`);
     const filteredValues = files.filter((element: string) => _.startsWith(element, `${start}.`))
     if (filteredValues.length === 0) throw new Error('Inexistant file');
@@ -45,7 +45,7 @@ export async function exactFilename(start: string) {
  * @param width
  * @param height
  */
-export async function resizeImage(filename: string, width: number, height: number) {
+export async function resizeImage(filename: string, width: number, height: number): Promise<void> {
     await ensureThumbFolderExists();
     if (await exactResizeExists(filename, width, height)) return;
     const imageName = await exactFilename(filename);
@@ -75,7 +75,7 @@ export async function exactResizeExists(filename: string, width: number, height:
 /**
  * Create thumb folder if not exists
  */
-export async function ensureThumbFolderExists() {
+export async function ensureThumbFolderExists(): Promise<void> {
     if (await fileExists('images/thumb'))
         return;
     await fs.mkdir(`${appRootPath.path}/images/thumb`);
