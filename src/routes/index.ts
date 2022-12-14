@@ -1,18 +1,30 @@
 import express, {Request, Response} from "express";
-import {fileExists, ls} from "../utils/file-management";
+import {exactFilename, resizeImage} from "../utils/file-management";
+import appRootPath from "app-root-path";
 
 const routes = express.Router();
 
+/**
+ * Resize an existing file
+ */
 routes.get('/images', async (req: Request, res: Response) => {
     let queryParameters = req.query;
 
-    const filename = queryParameters.filename;
-    const width = queryParameters.width;
-    const height = queryParameters.height;
+    const filename = queryParameters.filename as string;
+    const width = parseInt(queryParameters.width as string);
+    const height = parseInt(queryParameters.height as string);
 
-    // await fileExists('./src/full/ok.jpeg')
-    // await ls('./src/full')
-    res.send();
-})
+    try {
+        await resizeImage(filename, width, height);
+        const exactName = await exactFilename(filename);
+        res.sendFile(`${appRootPath.path}/images/thumb/${exactName}`);
+    } catch (e) {
+        res.status(400)
+            .send({
+            "status": "error",
+            "message": "Failed resizing image"
+        });
+    }
+});
 
 export default routes;
