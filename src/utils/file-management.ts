@@ -14,7 +14,6 @@ export async function fileExists(relativePath: string): Promise<boolean> {
         await fs.access(`${appRootPath.path}/${relativePath}`, constants.F_OK)
         return true;
     } catch (e: unknown) {
-        console.log(e);
         return false;
     }
 }
@@ -71,3 +70,12 @@ export async function exactResizeExists(filename: string, width: number, height:
     }
 }
 
+
+/**
+ * Create thumb folder if not exists
+ */
+export async function ensureThumbFolderExists() {
+    if (await fileExists('images/thumb'))
+        return;
+    await fs.mkdir(`${appRootPath.path}/images/thumb`);
+}

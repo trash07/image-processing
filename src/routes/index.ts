@@ -1,5 +1,5 @@
 import express, {Request, Response} from "express";
-import {exactFilename, resizeImage} from "../utils/file-management";
+import {ensureThumbFolderExists, exactFilename, fileExists, resizeImage} from "../utils/file-management";
 import appRootPath from "app-root-path";
 
 const routes = express.Router();
@@ -15,6 +15,7 @@ routes.get('/images', async (req: Request, res: Response) => {
     const height = parseInt(queryParameters.height as string);
 
     try {
+        await ensureThumbFolderExists();
         await resizeImage(filename, width, height);
         const exactName = await exactFilename(filename);
         res.sendFile(`${appRootPath.path}/images/thumb/${exactName}`);

@@ -1,24 +1,36 @@
 import {app} from "../index";
 import supertest from "supertest";
-import {promises as fs} from 'fs';
+import {exactFilename, exactResizeExists, resizeImage} from "../utils/file-management";
+import sharp from "sharp";
+import appRootPath from "app-root-path";
 
 describe('Image processing test suite', () => {
 
    const width = 300;
    const height = 100;
-   const filename = '';
+   const filename = 'fjord';
 
 
-   it('should be accessible', async () => {
-      const response = await supertest(app).get('/api/images');
+   it('endpoint should be accessible if everything is ok', async () => {
+      const response = await supertest(app).get(`/api/images?filename=${filename}&width=${width}&height=${height}`);
       expect(response.status).toEqual(200);
    });
 
+   it('endpoint should fail if resize parameters are not set', async () => {
+      const response = await supertest(app).get(`/api/images`);
+      expect(response.status).toEqual(400);
+   });
+
    it('should let transformation take place', async () => {
-      expect(true).toBeFalsy();
+      await resizeImage(filename, width, height);
+      expect(await exactResizeExists(filename, width, height)).toBeTrue();
    });
 
    it('should respect specified width and height dimensions', async () => {
-      expect(true).toBeFalsy();
+      await resizeImage(filename, width, height);
+      const metadata = await sharp(`${appRootPath.path}/images/thumb/${await exactFilename(filename)}`)
+          .metadata();
+      expect(metadata.width).toEqual(width);
+      expect(metadata.height).toEqual(height);
    });
 });
