@@ -6,6 +6,6 @@ const port = 3000;
 
 app.use('/api', routes);
 
-app.listen(port, () => {
+app.listen(port, ():void =>  {
     console.log(`Listening on port ${port}!`)
-})
+});
