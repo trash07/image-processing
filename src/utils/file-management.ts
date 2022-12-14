@@ -46,6 +46,7 @@ export async function exactFilename(start: string) {
  * @param height
  */
 export async function resizeImage(filename: string, width: number, height: number) {
+    await ensureThumbFolderExists();
     if (await exactResizeExists(filename, width, height)) return;
     const imageName = await exactFilename(filename);
     await sharp(`${appRootPath.path}/images/full/${imageName}`)

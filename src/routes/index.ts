@@ -15,7 +15,6 @@ routes.get('/images', async (req: Request, res: Response) => {
     const height = parseInt(queryParameters.height as string);
 
     try {
-        await ensureThumbFolderExists();
         await resizeImage(filename, width, height);
         const exactName = await exactFilename(filename);
         res.sendFile(`${appRootPath.path}/images/thumb/${exactName}`);
