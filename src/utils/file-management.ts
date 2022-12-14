@@ -83,6 +83,11 @@ export async function exactResizeExists(
  * Create thumb folder if not exists
  */
 export async function ensureThumbFolderExists(): Promise<void> {
-    if (await fileExists('images/thumb')) return
-    await fs.mkdir(`${appRootPath.path}/images/thumb`)
+    if (!await fileExists('images/thumb')) {
+        try {
+            await fs.mkdir(`${appRootPath.path}/images/thumb`)
+        } catch ({message}) {
+            console.log(`mkdir -> ${message}`);
+        }
+    }
 }
