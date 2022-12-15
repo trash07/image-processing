@@ -22,7 +22,38 @@ export async function fileExists(relativePath: string): Promise<boolean> {
  * @param relativePath
  */
 export async function ls(relativePath: string): Promise<Array<string>> {
-    return await fs.readdir(`${appRootPath.path}/${relativePath}`)
+    try {
+        return await fs.readdir(`${appRootPath.path}/${relativePath}`)
+    } catch {
+        return [];
+    }
+}
+
+/**
+ * Delete a file
+ * @param relativePath
+ */
+export async function deleteFile(relativePath: string): Promise<void> {
+    await fs.rm(`${appRootPath.path}/${relativePath}`);
+}
+
+/**
+ * Delete a folder
+ * @param relativePath
+ */
+export async function deleteFolder(relativePath: string): Promise<void> {
+    const files = await ls(relativePath);
+    if (files.length > 0) {
+        for (let file of files) {
+            await deleteFile(`images/thumb/${file}`);
+        }
+    }
+    let folderName = `${appRootPath.path}/${relativePath}`;
+    try {
+        await fs.rmdir(folderName);
+    } catch ({message}) {
+        // Log the error message
+    }
 }
 
 /**
@@ -68,12 +99,12 @@ export async function exactResizeExists(
     width: number,
     height: number
 ): Promise<boolean> {
-    const imageName = await exactFilename(filename)
+    const imageName = await exactFilename(filename);
     try {
         const metadata = await sharp(
             `${appRootPath.path}/images/thumb/${imageName}`
-        ).metadata()
-        return metadata.width === width && metadata.height === height
+        ).metadata();
+        return metadata.width === width && metadata.height === height;
     } catch {
         return false
     }

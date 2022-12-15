@@ -1,8 +1,9 @@
 import { app } from '../index'
 import supertest from 'supertest'
 import {
+    deleteFolder,
     exactFilename,
-    exactResizeExists,
+    exactResizeExists, ls,
     resizeImage,
 } from '../utils/file-management'
 import sharp from 'sharp'
@@ -12,6 +13,10 @@ describe('Image processing test suite', () => {
     const width = 300
     const height = 100
     const filename = 'fjord'
+
+    beforeEach(async () => {
+        await deleteFolder('images/thumb')
+    });
 
     it('endpoint should be accessible if everything is ok', async (): Promise<void> => {
         const response = await supertest(app).get(
@@ -37,5 +42,9 @@ describe('Image processing test suite', () => {
         ).metadata()
         expect(metadata.width).toEqual(width)
         expect(metadata.height).toEqual(height)
+    });
+
+    afterAll(async () => {
+        await deleteFolder('images/thumb');
     })
 })
